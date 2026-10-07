@@ -6,6 +6,8 @@ __pycache__/
 .vscode/
 .idea/
 .claude/
+/.codex/
+/AGENTS.md
 
 # experiment outputs and local caches (repository root only)
 /runs/

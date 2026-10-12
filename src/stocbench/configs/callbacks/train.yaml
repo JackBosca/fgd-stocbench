@@ -31,3 +31,7 @@ metrics:
   schedule: u:100
   ensemble_size: ${evaluate.ensemble_size}
   rollout_steps: ${evaluate.rollout_steps}
+
+text_metrics:
+  _target_: stocbench.callbacks.text_metrics.TextMetrics
+  every_n_train_batches: 0  # epoch/validation summaries; set N > 0 for additional batch updates

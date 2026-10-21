@@ -57,6 +57,13 @@ stocbench plot results/det/fm results/det/si --plots-config src/stocbench/config
 
 [scripts/reproduce_stocbench.sh](scripts/reproduce_stocbench.sh) lists every evaluation: eight sampler configurations per experiment, then the figures. Submit its lines to a cluster rather than running it in one shot.
 
+## Independent validation and test
+
+The [held-out workflow](inspect/heldout_protocol.md) preserves original training data,
+generates independent validation/test simulations, freezes explicit manifests, and
+reevaluates pinned baseline checkpoints. It includes tracked Slurm launchers and
+a job/log picker. This is separate from the legacy reproduction protocol.
+
 ## Datasets
 
 The solver in [solver/](solver) generated the data:

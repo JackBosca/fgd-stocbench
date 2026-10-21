@@ -56,6 +56,10 @@ The current full evaluation uses 3,000 model samples per one-step condition and 
 
 **Validation and held-out data**
 
+The [new held-out workflow](heldout_protocol.md) implements independent generation,
+explicit manifests, pinned checkpoint evaluation and Slurm monitoring. The table
+below describes legacy defaults; production held-out data has not yet been generated.
+
 | Evaluation | Validation during training | Full evaluation | Separation |
 |---|---|---|---|
 | `stoc`, one-step | Cases 100–115 | Cases 100–147 | Cases 116–147 are unseen during training and validation; the other 16 overlap validation |

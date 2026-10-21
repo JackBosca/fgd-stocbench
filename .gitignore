@@ -22,3 +22,8 @@ __pycache__/
 *.ckpt
 /data/
 /checkpoints/
+
+# Keep existing local launchers private; version only the new portable workflow.
+!/slurm/
+/slurm/*
+!/slurm/heldout/

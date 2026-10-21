@@ -1,0 +1,16 @@
+{
+  "variant": "stoc",
+  "seed": 42,
+  "selection_provenance": "Published checkpoints; record source repository revision and epoch for each local file.",
+  "checkpoints": {
+    "dm": {"path": "/absolute/path/dm.ckpt", "provenance": "REPLACE with published revision and epoch"},
+    "fm": {"path": "/absolute/path/fm.ckpt", "provenance": "REPLACE with published revision and epoch"},
+    "si": {"path": "/absolute/path/si.ckpt", "provenance": "REPLACE with published revision and epoch"},
+    "edm": {"path": "/absolute/path/edm.ckpt", "provenance": "REPLACE with teacher revision and epoch"},
+    "cd": {"path": "/absolute/path/cd.ckpt", "provenance": "REPLACE with published revision and epoch"},
+    "add_fm": {"path": "/absolute/path/add_fm.ckpt", "provenance": "REPLACE with published revision and epoch"}
+  },
+  "baselines": ["si", "fm", "dpm2", "ddim", "ddpm", "cd1", "cd2", "addfm"],
+  "model_overrides": {},
+  "schedules": {}
+}

@@ -1,0 +1,7 @@
+defaults:
+  - det
+  - _self_
+_target_: stocbench.data.heldout.ManifestData
+manifest: null
+partition: validation
+rollout_steps: ${evaluate.rollout_steps}

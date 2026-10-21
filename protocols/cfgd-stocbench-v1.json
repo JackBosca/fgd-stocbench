@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "cfgd-stocbench-v1",
+  "rng_namespace": "cfgd-stocbench-v1-independent-20261017",
+  "solver": {
+    "n": 256, "l": 6.283185307179586, "dt": 0.0001,
+    "nu": 0.001, "drag": -0.1, "sample_dt": 0.5, "epsilon": 1.0,
+    "forcing_modes": [[6.0, 0.0], [7.0, 0.0], [5.0, 5.0], [8.0, 8.0]],
+    "mean": 0.0, "std": 3.0
+  },
+  "grid": 64,
+  "warmup_frames": 100,
+  "trajectory_frames": 200,
+  "trajectories_per_partition": 500,
+  "reference_members": 5000,
+  "partitions": {
+    "validation": {"trajectory_seed": 10000, "case_start": 20000, "cases": 16},
+    "test": {"trajectory_seed": 10001, "case_start": 21000, "cases": 48}
+  },
+  "rollout_horizons": [10, 50],
+  "rollout_start": 0,
+  "generated_members": {"validation": {"stoc": 1000, "det": 32}, "test": {"stoc": 3000, "det": 3000}}
+}

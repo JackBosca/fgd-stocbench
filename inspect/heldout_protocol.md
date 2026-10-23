@@ -150,10 +150,13 @@ as well. One process/GPU per evaluation job avoids distributed duplication.
 Validation and testing use different dataset/spectrum selections. Training with
 `data=heldout_stoc`/`heldout_det` rejects `data.partition=test`.
 
-Existing baseline weights can be reevaluated: new independent test data removes
-the old test reuse problem. Retraining is needed only when changing training
-membership or requiring matched training/selection histories. Historical scores
-cannot be copied into the new comparison table.
+Existing baseline weights can be reevaluated on the new independent test data.
+This avoids the overlap in the legacy default selections; it does not establish
+that the paper's reported runs used those selections. Published training and
+evaluation membership remains unverified; see the
+[checkpoint provenance audit](dataset_guide.md). Retraining is needed when
+changing training membership or requiring matched training/selection histories.
+Historical scores cannot be copied into the new comparison table.
 
 ## Monitoring and checks
 

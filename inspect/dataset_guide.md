@@ -2,6 +2,9 @@
 
 These notes describe the downloaded 64×64 data and this checkout's default loaders.
 
+For the four evaluation cases, exact legacy/new filenames, and unresolved paper
+provenance, see the [split comparison](split_summary.md).
+
 **Stochastic variant (`stoc`)**
 
 The model receives current vorticity and generates a possible next-vorticity field. Forcing is unobserved, so repeated predictions for the same input should reproduce the conditional distribution of possible outcomes.
@@ -58,11 +61,11 @@ The current full evaluation uses 3,000 model samples per one-step condition and 
 
 The [new held-out workflow](heldout_protocol.md) implements independent generation,
 explicit manifests, pinned checkpoint evaluation and Slurm monitoring. The table
-below describes legacy defaults; production held-out data has not yet been generated.
+below describes legacy defaults, not the new frozen release.
 
 | Evaluation | Validation during training | Full evaluation | Separation |
 |---|---|---|---|
-| `stoc`, one-step | Cases 100–115 | Cases 100–147 | Cases 116–147 are unseen during training and validation; the other 16 overlap validation |
+| `stoc`, one-step | Cases 100–115 | Cases 100–147 | Cases 116–147 are excluded from default training/validation; the other 16 overlap validation. Historical use is unverified |
 | `stoc`, rollout | 1,000 starts from seed 42 | 3,000 starts from seed 42 | Starting fields come from training data |
 | `det`, one-step | 48 pairs from seed 45 | Same 48 pairs | Held out from training, reused from validation |
 | `det`, rollout | 32 windows from seed 45 | 3,000 windows from seed 45 | Held out from training; validation and evaluation selections overlap at the same rollout length |
@@ -81,5 +84,29 @@ The [paper](https://arxiv.org/pdf/2608.22309v1) evaluates both modes for both va
 | `det` | Mean error: Figure 6 left; predictive variability: Figure 5 right | Trajectory RMSE: Figure 6 right; enstrophy statistics: Figure 7, over 50 steps |
 
 Paper v1's Appendix A describes 5,000 additional stochastic rollout starts and 5,000 deterministic test trajectories with 50 state–forcing pairs. This checkout instead selects 3,000 starts/windows from trajectory seeds 42/45. Keep that difference explicit when describing your experimental protocol; the split details above describe the code, not a claim about the authors' original runs.
+
+**Checkpoint provenance audit (2026-10-23)**
+
+The local clone of [the published checkpoint repository](https://huggingface.co/pfistse/stocbench-ckpts/tree/10b872dbe4b33aa8dd30cdc2e65515c2ce652e8b)
+contains 14 Git LFS pointers, not checkpoint payloads. Its tracked tree contains
+no run configurations, model card, or evaluation logs. HTTP range reads at that
+revision retrieved the complete serialized metadata sections of all 14 hosted
+checkpoints; `pickletools.genops` inspected them without executing pickle code
+or loading tensor weights. No dataset membership, split manifest, or evaluation
+input provenance was found. Some checkpoints contain model hyperparameters and
+teacher/prior checkpoint references; these do not identify training examples or
+the inputs used for published scores.
+
+The legacy loaders and relevant data/experiment/evaluation configurations match
+upstream commit `2e519f153738972fb41c7c996ada8e1a4f4cb7a9` (empty targeted
+`git diff`). Their overlap is executable behavior, not merely a comment typo.
+However, neither this behavior nor checkpoint metadata establishes the settings
+used for the paper's figures. Different execution overrides, unpublished code,
+or paper/code documentation errors remain possible explanations. Original run
+configs, data identities, evaluation artifacts, or author clarification are
+needed to resolve that question. The cause of earlier overstatement was treating
+default-code overlap as evidence of published-run overlap. Fresh held-out data
+establishes our own explicit protocol; it does not prove the paper's results
+were affected by test reuse.
 
 Sources: [data configs](src/stocbench/configs/data/), [dataset loaders](src/stocbench/data/), [validation settings](src/stocbench/configs/experiment/), [full evaluation settings](src/stocbench/configs/evaluate/stocbench.yaml), and [inspection notebook](inspect/inspect_data.ipynb).

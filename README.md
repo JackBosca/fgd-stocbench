@@ -55,6 +55,10 @@ stocbench plot results/det/fm results/det/si --plots-config src/stocbench/config
 
 ## Reproducing the paper
 
+[Published metric reference tables and CSVs](inspect/paper_metrics/README.md) cover
+all eight baselines across stochastic/deterministic one-step and rollout tasks,
+with figure-extraction precision and split-comparison limits.
+
 [scripts/reproduce_stocbench.sh](scripts/reproduce_stocbench.sh) lists every evaluation: eight sampler configurations per experiment, then the figures. Submit its lines to a cluster rather than running it in one shot.
 
 ## Independent validation and test

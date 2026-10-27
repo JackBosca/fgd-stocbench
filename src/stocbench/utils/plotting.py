@@ -69,11 +69,17 @@ def plot_runs(
     overrides = cfg.get("runs", {})  # per-experiment registry tweaks, e.g. a label that only makes sense for this eval
     runs = []
     for path in map(Path, paths):
-        s = {**registry.get(path.name, {}), **overrides.get(path.name, {})}
+        # Job-ID directories still need the model's label and NFE conversion.
+        key = path.name
+        config_path = path / "config.yaml"
+        if key not in registry and config_path.is_file():
+            metadata = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
+            key = metadata.get("model", key)
+        s = {**registry.get(key, {}), **overrides.get(key, {}), **overrides.get(path.name, {})}
         runs.append(
             Run(
                 path,
-                s.get("label", path.name),
+                s.get("label", key),
                 s.get("color"),
                 s.get("linestyle", "solid"),
                 s.get("marker"),
@@ -416,6 +422,8 @@ def plot_seed_fields(runs, cfg) -> plt.Figure | None:
         if isinstance(want, (list, tuple))
         else np.argsort(seeds)[:want]
     )  # explicit seed list, else the n smallest seeds
+    if not len(order):
+        return None  # legacy case IDs may be absent from an independent release
     n, ref = len(order), fields["Ground truth"]
     rows = ["Ground truth", *(r for r in fields if r != "Ground truth")]  # GT maps on top, method errors below
     cols = [(stat, i) for stat in ("mean", "std") for i in order]  # 2 stats x n seeds

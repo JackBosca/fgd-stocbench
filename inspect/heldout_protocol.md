@@ -143,6 +143,66 @@ its CD schedules; tune only on validation. Use separate locks for the variants.
 Final test requires an explicit `--partition test` and a fresh run directory.
 Keep the locked settings unchanged after inspecting test results.
 
+### Validation readiness and batching
+
+The eight comparisons per variant are `si`, `fm`, `dpm2`, `ddim`, `ddpm`, `cd1`,
+`cd2`, and `addfm`: 16 jobs for both variants on validation alone. They need six
+checkpoint files per variant (`si`, `fm`, `dm`, `edm`, `cd`, `add_fm`), including
+the EDM/FM teachers. DDIM/DDPM/DPM-2 share DM weights; CD-1/CD-2 share CD weights.
+Keep the legacy CD-2 schedule `at:[0,2]` for both variants in this comparison,
+as explicitly selected. This differs from the paper's deterministic CD-2 noise
+level; the choice belongs in the checkpoint lock's selection provenance.
+
+Inference is already batched in `EvalCallback._sample`: `--batch-size` controls
+GPU chunks of ensemble members and the held-out rollout loader's batch size.
+The default is 32. Changing it can change random-number assignment and floating
+point rounding, so it does not promise identical samples. Retain 32 for these
+runs; no sampler, precision, random stream, or metric calculation is changed.
+The 400-step stochastic validation pass retains intermediate samples for
+mean/std curves, so GPU memory also depends on the ensemble and schedule length,
+not only the chunk size. GPU throughput and peak memory still require a measured
+allocation; the launcher's 24-hour request is not a runtime estimate.
+
+Output plots use the saved model name when the run directory is a job ID or
+other unregistered name. This preserves DPM-2's `2 * steps - 1` NFE axis and
+DDIM/DDPM labels. The cause of the previous wrong axis was relying only on the
+directory basename. The legacy seed-field panel is skipped when none of its
+requested case IDs occur; the per-schedule mean/std grids still show held-out
+cases. Metrics and their NPZ artifacts are unaffected.
+
+CPU readiness checks on 2026-10-24 verified all 12 published checkpoint payloads
+against their LFS sizes and SHA-256 hashes at repository revision
+`10b872dbe4b33aa8dd30cdc2e65515c2ce652e8b`. All 16 baseline/variant configurations
+composed, loaded their weights strictly, and produced finite two-member 64×64
+samples in a bounded CPU check (two solver steps for the iterative models).
+Validation selections contained 16 one-step conditions and 500 rollout starts;
+both 10- and 50-step windows were checked. These checks are not GPU benchmarks
+or full evaluations. Check reports belong in external development output storage.
+
+With the downloaded files and per-variant locks under `CHECKPOINT_ROOT`, launch
+validation only from the repository root. Set `FROZEN_ROOT`, `CHECKPOINT_ROOT`,
+and `OUTPUT_ROOT` to the local scratch release, retained checkpoints, and intended
+research output root. The lock paths below distinguish this selection from any
+later test campaign:
+
+```bash
+mkdir -p slurm/logs
+campaign="validation-$(date -u +%Y%m%dT%H%M%SZ)"
+for variant in stoc det; do
+  for baseline in si fm dpm2 ddim ddpm cd1 cd2 addfm; do
+    sbatch --job-name="val-${variant}-${baseline}" slurm/heldout/evaluate.sh \
+      --manifest "$FROZEN_ROOT/$variant.json" \
+      --lock "$CHECKPOINT_ROOT/locks/cfgd-stocbench-v1-validation/$variant.lock.json" \
+      --baseline "$baseline" --partition validation --batch-size 32 \
+      --run-dir "$OUTPUT_ROOT/eval/$variant/$baseline/$campaign" || break 2
+  done
+done
+```
+
+This submits 16 independent one-GPU jobs. The frozen validation partition is
+explicit even though the underlying Lightning API calls its inference loop
+`test`; no final-test cases are selected. Each run directory must be new.
+
 The wrapper checks checkpoint hashes and selected data hashes before inference,
 saves the lock, manifest hash, command and source hashes, and launches the
 existing metric/plot pipeline with explicit selections. Teacher paths are pinned

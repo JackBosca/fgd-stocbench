@@ -4,6 +4,9 @@ These notes describe the downloaded 64×64 data and this checkout's default load
 
 For the four evaluation cases, exact legacy/new filenames, and unresolved paper
 provenance, see the [split comparison](split_summary.md).
+Measured baseline scores on the fresh validation release are in
+[validation metrics](validation_metrics/README.md); historical figure-derived
+values remain in [paper metrics](paper_metrics/README.md).
 
 **Stochastic variant (`stoc`)**
 
